@@ -18,10 +18,24 @@ package serval
 
 import munit.*
 
-class EnvReadSuite extends FunSuite {
+class ServalSuite extends FunSuite {
 
-  test("dummy") {
-    assert(true)
+  case class SimpleConfig(a: Int)
+
+  given EnvRead[SimpleConfig] = env("CONFIG_A").as[Int].map(SimpleConfig.apply)
+
+  test("SimpleConfig success") {
+    val result = load[SimpleConfig](Map("CONFIG_A" -> "42"))
+    assertEquals(result, Right(SimpleConfig(42)))
   }
 
+  test("SimpleConfig missing") {
+    val result = load[SimpleConfig](Map("WRONG" -> "1"))
+    assert(result.isLeft)
+  }
+
+  test("SimpleConfig parse error") {
+    val result = load[SimpleConfig](Map("CONFIG_A" -> "not and int"))
+    assert(result.isLeft)
+  }
 }
