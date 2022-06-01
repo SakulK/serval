@@ -16,36 +16,12 @@
 
 package serval
 
-enum EnvLoadResult[+T]:
-  case Success(name: String, value: T) extends EnvLoadResult[T]
-  case Missing(name: String) extends EnvLoadResult[Nothing]
-  case ParseError(name: String, error: String) extends EnvLoadResult[Nothing]
-  case AggregatedErrors(errors: List[EnvLoadResult[Nothing]])
-      extends EnvLoadResult[Nothing]
-
 trait EnvRead[T]:
   def read(values: Map[String, String]): EnvLoadResult[T]
 
 object EnvRead:
   def apply[T](using envRead: EnvRead[T]): EnvRead[T] =
     envRead
-
-def env(name: String): EnvRead[String] =
-  new EnvRead[String]:
-    def read(values: Map[String, String]): EnvLoadResult[String] =
-      values.get(name) match {
-        case Some(value) => EnvLoadResult.Success(name, value)
-        case None        => EnvLoadResult.Missing(name)
-      }
-
-def load[T: EnvRead](values: Map[String, String]): Either[String, T] =
-  EnvRead[T].read(values) match {
-    case EnvLoadResult.Success(name, value) => Right(value)
-    case EnvLoadResult.Missing(name)        => Left(s"Missing $name")
-    case EnvLoadResult.ParseError(name, error) =>
-      Left(s"Error while parsing $name: $error")
-    case EnvLoadResult.AggregatedErrors(errors) => Left(s"Errors: $errors")
-  }
 
 extension [A](envRead: EnvRead[A])
   def map[B](f: A => B): EnvRead[B] =
@@ -73,16 +49,22 @@ extension [A](envRead: EnvRead[A])
           case a: EnvLoadResult.AggregatedErrors => a
         }
 
-trait EnvParse[A, B]:
-  def parse(input: A): Either[String, B]
+  def or(other: EnvRead[A]): EnvRead[A] =
+    new EnvRead[A]:
+      def read(values: Map[String, String]): EnvLoadResult[A] =
+        envRead.read(values) match {
+          case s: EnvLoadResult.Success[A]       => s
+          case m: EnvLoadResult.Missing          => other.read(values)
+          case p: EnvLoadResult.ParseError       => p
+          case a: EnvLoadResult.AggregatedErrors => a
+        }
 
-object EnvParse:
-
-  def apply[A, B](using envParse: EnvParse[A, B]): EnvParse[A, B] = envParse
-
-  given EnvParse[String, Int] with
-    def parse(input: String): Either[String, Int] =
-      input.toIntOption match {
-        case Some(value) => Right(value)
-        case None        => Left(s"Failed to parse Int from \"$input\"")
-      }
+  def default(value: A): EnvRead[A] =
+    new EnvRead[A]:
+      def read(values: Map[String, String]): EnvLoadResult[A] =
+        envRead.read(values) match {
+          case s: EnvLoadResult.Success[A]       => s
+          case m: EnvLoadResult.Missing          => EnvLoadResult.Success("<default>", value)
+          case p: EnvLoadResult.ParseError       => p
+          case a: EnvLoadResult.AggregatedErrors => a
+        }
