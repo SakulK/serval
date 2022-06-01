@@ -63,8 +63,9 @@ extension [A](envRead: EnvRead[A])
     new EnvRead[A]:
       def read(values: Map[String, String]): EnvLoadResult[A] =
         envRead.read(values) match {
-          case s: EnvLoadResult.Success[A]       => s
-          case m: EnvLoadResult.Missing          => EnvLoadResult.Success("<default>", value)
+          case s: EnvLoadResult.Success[A] => s
+          case m: EnvLoadResult.Missing =>
+            EnvLoadResult.Success("<default>", value)
           case p: EnvLoadResult.ParseError       => p
           case a: EnvLoadResult.AggregatedErrors => a
         }

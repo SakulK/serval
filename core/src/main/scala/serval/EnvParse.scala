@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package serval 
+package serval
 
 trait EnvParse[A, B]:
   def parse(input: A): Either[String, B]
@@ -29,4 +29,3 @@ object EnvParse:
         case Some(value) => Right(value)
         case None        => Left(s"Failed to parse Int from \"$input\"")
       }
-

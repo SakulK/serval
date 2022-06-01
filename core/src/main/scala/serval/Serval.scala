@@ -32,4 +32,3 @@ def load[T: EnvRead](values: Map[String, String]): Either[String, T] =
       Left(s"Error while parsing $name: $error")
     case EnvLoadResult.AggregatedErrors(errors) => Left(s"Errors: $errors")
   }
-
