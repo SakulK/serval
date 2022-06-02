@@ -85,3 +85,161 @@ extension [A0, A1, A2, A3, A4, A5](
           .mapResult { case (((((a0, a1), a2), a3), a4), a5) =>
             f(a0, a1, a2, a3, a4, a5)
           }
+
+extension [A0, A1, A2, A3, A4, A5, A6](
+    tuple: (
+        EnvRead[A0],
+        EnvRead[A1],
+        EnvRead[A2],
+        EnvRead[A3],
+        EnvRead[A4],
+        EnvRead[A5],
+        EnvRead[A6]
+    )
+)
+  def mapN[B](f: (A0, A1, A2, A3, A4, A5, A6) => B): EnvRead[B] =
+    new EnvRead[B]:
+      def read(values: Map[String, String]): EnvLoadResult[B] =
+        val (r0, r1, r2, r3, r4, r5, r6) = tuple
+        r0.read(values)
+          .product(r1.read(values))
+          .product(r2.read(values))
+          .product(r3.read(values))
+          .product(r4.read(values))
+          .product(r5.read(values))
+          .product(r6.read(values))
+          .mapResult { case ((((((a0, a1), a2), a3), a4), a5), a6) =>
+            f(a0, a1, a2, a3, a4, a5, a6)
+          }
+
+extension [A0, A1, A2, A3, A4, A5, A6, A7](
+    tuple: (
+        EnvRead[A0],
+        EnvRead[A1],
+        EnvRead[A2],
+        EnvRead[A3],
+        EnvRead[A4],
+        EnvRead[A5],
+        EnvRead[A6],
+        EnvRead[A7]
+    )
+)
+  def mapN[B](f: (A0, A1, A2, A3, A4, A5, A6, A7) => B): EnvRead[B] =
+    new EnvRead[B]:
+      def read(values: Map[String, String]): EnvLoadResult[B] =
+        val (r0, r1, r2, r3, r4, r5, r6, r7) = tuple
+        r0.read(values)
+          .product(r1.read(values))
+          .product(r2.read(values))
+          .product(r3.read(values))
+          .product(r4.read(values))
+          .product(r5.read(values))
+          .product(r6.read(values))
+          .product(r7.read(values))
+          .mapResult { case (((((((a0, a1), a2), a3), a4), a5), a6), a7) =>
+            f(a0, a1, a2, a3, a4, a5, a6, a7)
+          }
+
+extension [A0, A1, A2, A3, A4, A5, A6, A7, A8](
+    tuple: (
+        EnvRead[A0],
+        EnvRead[A1],
+        EnvRead[A2],
+        EnvRead[A3],
+        EnvRead[A4],
+        EnvRead[A5],
+        EnvRead[A6],
+        EnvRead[A7],
+        EnvRead[A8]
+    )
+)
+  def mapN[B](f: (A0, A1, A2, A3, A4, A5, A6, A7, A8) => B): EnvRead[B] =
+    new EnvRead[B]:
+      def read(values: Map[String, String]): EnvLoadResult[B] =
+        val (r0, r1, r2, r3, r4, r5, r6, r7, r8) = tuple
+        r0.read(values)
+          .product(r1.read(values))
+          .product(r2.read(values))
+          .product(r3.read(values))
+          .product(r4.read(values))
+          .product(r5.read(values))
+          .product(r6.read(values))
+          .product(r7.read(values))
+          .product(r8.read(values))
+          .mapResult {
+            case ((((((((a0, a1), a2), a3), a4), a5), a6), a7), a8) =>
+              f(a0, a1, a2, a3, a4, a5, a6, a7, a8)
+          }
+
+extension [A0, A1, A2, A3, A4, A5, A6, A7, A8, A9](
+    tuple: (
+        EnvRead[A0],
+        EnvRead[A1],
+        EnvRead[A2],
+        EnvRead[A3],
+        EnvRead[A4],
+        EnvRead[A5],
+        EnvRead[A6],
+        EnvRead[A7],
+        EnvRead[A8],
+        EnvRead[A9]
+    )
+)
+  def mapN[B](f: (A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) => B): EnvRead[B] =
+    new EnvRead[B]:
+      def read(values: Map[String, String]): EnvLoadResult[B] =
+        val (r0, r1, r2, r3, r4, r5, r6, r7, r8, r9) = tuple
+        r0.read(values)
+          .product(r1.read(values))
+          .product(r2.read(values))
+          .product(r3.read(values))
+          .product(r4.read(values))
+          .product(r5.read(values))
+          .product(r6.read(values))
+          .product(r7.read(values))
+          .product(r8.read(values))
+          .product(r9.read(values))
+          .mapResult {
+            case (((((((((a0, a1), a2), a3), a4), a5), a6), a7), a8), a9) =>
+              f(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9)
+          }
+
+extension [A0, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10](
+    tuple: (
+        EnvRead[A0],
+        EnvRead[A1],
+        EnvRead[A2],
+        EnvRead[A3],
+        EnvRead[A4],
+        EnvRead[A5],
+        EnvRead[A6],
+        EnvRead[A7],
+        EnvRead[A8],
+        EnvRead[A9],
+        EnvRead[A10]
+    )
+)
+  def mapN[B](
+      f: (A0, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10) => B
+  ): EnvRead[B] =
+    new EnvRead[B]:
+      def read(values: Map[String, String]): EnvLoadResult[B] =
+        val (r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10) = tuple
+        r0.read(values)
+          .product(r1.read(values))
+          .product(r2.read(values))
+          .product(r3.read(values))
+          .product(r4.read(values))
+          .product(r5.read(values))
+          .product(r6.read(values))
+          .product(r7.read(values))
+          .product(r8.read(values))
+          .product(r9.read(values))
+          .product(r10.read(values))
+          .mapResult {
+            case (
+                  (((((((((a0, a1), a2), a3), a4), a5), a6), a7), a8), a9),
+                  a10
+                ) =>
+              f(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)
+          }
