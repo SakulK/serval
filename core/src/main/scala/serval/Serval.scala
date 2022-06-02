@@ -21,14 +21,17 @@ def env(name: String): EnvRead[String] =
     def read(values: Map[String, String]): EnvLoadResult[String] =
       values.get(name) match {
         case Some(value) => EnvLoadResult.Success(name, value)
-        case None        => EnvLoadResult.Missing(name)
+        case None        => EnvLoadResult.Failure(EnvLoadError.Missing(name))
       }
 
 def load[T: EnvRead](values: Map[String, String]): Either[String, T] =
   EnvRead[T].read(values) match {
-    case EnvLoadResult.Success(name, value) => Right(value)
-    case EnvLoadResult.Missing(name)        => Left(s"Missing $name")
-    case EnvLoadResult.ParseError(name, error) =>
+    case EnvLoadResult.Success(name, value) =>
+      Right(value)
+    case EnvLoadResult.Failure(EnvLoadError.Missing(name)) =>
+      Left(s"Missing $name")
+    case EnvLoadResult.Failure(EnvLoadError.ParseError(name, error)) =>
       Left(s"Error while parsing $name: $error")
-    case EnvLoadResult.AggregatedErrors(errors) => Left(s"Errors: $errors")
+    case EnvLoadResult.Failure(EnvLoadError.AggregatedErrors(errors)) =>
+      Left(s"Errors: $errors")
   }

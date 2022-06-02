@@ -30,9 +30,7 @@ extension [A](envRead: EnvRead[A])
         envRead.read(values) match {
           case EnvLoadResult.Success(name, value) =>
             EnvLoadResult.Success(name, f(value))
-          case m: EnvLoadResult.Missing          => m
-          case p: EnvLoadResult.ParseError       => p
-          case a: EnvLoadResult.AggregatedErrors => a
+          case f: EnvLoadResult.Failure => f
         }
 
   def as[B](using envParse: EnvParse[A, B]): EnvRead[B] =
@@ -42,21 +40,20 @@ extension [A](envRead: EnvRead[A])
           case EnvLoadResult.Success(name, value) =>
             envParse.parse(value) match {
               case Right(parsed) => EnvLoadResult.Success(name, parsed)
-              case Left(error)   => EnvLoadResult.ParseError(name, error)
+              case Left(error) =>
+                EnvLoadResult.Failure(EnvLoadError.ParseError(name, error))
             }
-          case m: EnvLoadResult.Missing          => m
-          case p: EnvLoadResult.ParseError       => p
-          case a: EnvLoadResult.AggregatedErrors => a
+          case f: EnvLoadResult.Failure => f
         }
 
   def or(other: EnvRead[A]): EnvRead[A] =
     new EnvRead[A]:
       def read(values: Map[String, String]): EnvLoadResult[A] =
         envRead.read(values) match {
-          case s: EnvLoadResult.Success[A]       => s
-          case m: EnvLoadResult.Missing          => other.read(values)
-          case p: EnvLoadResult.ParseError       => p
-          case a: EnvLoadResult.AggregatedErrors => a
+          case s: EnvLoadResult.Success[A] => s
+          case EnvLoadResult.Failure(_: EnvLoadError.Missing) =>
+            other.read(values)
+          case f: EnvLoadResult.Failure => f
         }
 
   def default(value: A): EnvRead[A] =
@@ -64,8 +61,14 @@ extension [A](envRead: EnvRead[A])
       def read(values: Map[String, String]): EnvLoadResult[A] =
         envRead.read(values) match {
           case s: EnvLoadResult.Success[A] => s
-          case m: EnvLoadResult.Missing =>
+          case EnvLoadResult.Failure(_: EnvLoadError.Missing) =>
             EnvLoadResult.Success("<default>", value)
-          case p: EnvLoadResult.ParseError       => p
-          case a: EnvLoadResult.AggregatedErrors => a
+          case f: EnvLoadResult.Failure => f
         }
+
+extension [A1, A2](tuple: (EnvRead[A1], EnvRead[A2]))
+  def mapN[B](f: (A1, A2) => B): EnvRead[B] =
+    new EnvRead[B]:
+      def read(values: Map[String, String]): EnvLoadResult[B] =
+        val (r1, r2) = tuple
+        r1.read(values).product(r2.read(values)).mapResult(f.tupled)

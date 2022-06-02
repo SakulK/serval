@@ -83,4 +83,27 @@ class ServalSuite extends FunSuite {
     val result = load[DefaultConfig](Map("CONFIG_A" -> "text"))
     assert(result.isLeft)
   }
+
+  case class TwoValues(a: Int, b: String)
+
+  given EnvRead[TwoValues] =
+    (
+      env("CONFIG_A").as[Int],
+      env("CONFIG_B")
+    ).mapN(TwoValues.apply)
+
+  test("TwoValues success") {
+    val result = load[TwoValues](Map("CONFIG_A" -> "4", "CONFIG_B" -> "b"))
+    assertEquals(result, Right(TwoValues(4, "b")))
+  }
+
+  test("TwoValues missing one") {
+    val result = load[TwoValues](Map("CONFIG_A" -> "4", "CONFIG_BAR" -> "b"))
+    assert(result.isLeft)
+  }
+
+  test("TwoValues parse error") {
+    val result = load[TwoValues](Map("CONFIG_A" -> "a", "CONFIG_B" -> "b"))
+    assert(result.isLeft)
+  }
 }
