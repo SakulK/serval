@@ -65,10 +65,3 @@ extension [A](envRead: EnvRead[A])
             EnvLoadResult.Success("<default>", value)
           case f: EnvLoadResult.Failure => f
         }
-
-extension [A1, A2](tuple: (EnvRead[A1], EnvRead[A2]))
-  def mapN[B](f: (A1, A2) => B): EnvRead[B] =
-    new EnvRead[B]:
-      def read(values: Map[String, String]): EnvLoadResult[B] =
-        val (r1, r2) = tuple
-        r1.read(values).product(r2.read(values)).mapResult(f.tupled)
