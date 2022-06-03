@@ -16,6 +16,7 @@
 
 package serval
 
+// format: off
 extension [A0, A1](tuple: (EnvRead[A0], EnvRead[A1]))
   def mapN[B](f: (A0, A1) => B): EnvRead[B] =
     new EnvRead[B]:
@@ -63,14 +64,7 @@ extension [A0, A1, A2, A3, A4](
           }
 
 extension [A0, A1, A2, A3, A4, A5](
-    tuple: (
-        EnvRead[A0],
-        EnvRead[A1],
-        EnvRead[A2],
-        EnvRead[A3],
-        EnvRead[A4],
-        EnvRead[A5]
-    )
+    tuple: (EnvRead[A0], EnvRead[A1], EnvRead[A2], EnvRead[A3], EnvRead[A4], EnvRead[A5])
 )
   def mapN[B](f: (A0, A1, A2, A3, A4, A5) => B): EnvRead[B] =
     new EnvRead[B]:
@@ -87,15 +81,7 @@ extension [A0, A1, A2, A3, A4, A5](
           }
 
 extension [A0, A1, A2, A3, A4, A5, A6](
-    tuple: (
-        EnvRead[A0],
-        EnvRead[A1],
-        EnvRead[A2],
-        EnvRead[A3],
-        EnvRead[A4],
-        EnvRead[A5],
-        EnvRead[A6]
-    )
+    tuple: (EnvRead[A0], EnvRead[A1], EnvRead[A2], EnvRead[A3], EnvRead[A4], EnvRead[A5], EnvRead[A6])
 )
   def mapN[B](f: (A0, A1, A2, A3, A4, A5, A6) => B): EnvRead[B] =
     new EnvRead[B]:
@@ -113,16 +99,7 @@ extension [A0, A1, A2, A3, A4, A5, A6](
           }
 
 extension [A0, A1, A2, A3, A4, A5, A6, A7](
-    tuple: (
-        EnvRead[A0],
-        EnvRead[A1],
-        EnvRead[A2],
-        EnvRead[A3],
-        EnvRead[A4],
-        EnvRead[A5],
-        EnvRead[A6],
-        EnvRead[A7]
-    )
+    tuple: (EnvRead[A0], EnvRead[A1], EnvRead[A2], EnvRead[A3], EnvRead[A4], EnvRead[A5], EnvRead[A6], EnvRead[A7])
 )
   def mapN[B](f: (A0, A1, A2, A3, A4, A5, A6, A7) => B): EnvRead[B] =
     new EnvRead[B]:
@@ -141,17 +118,7 @@ extension [A0, A1, A2, A3, A4, A5, A6, A7](
           }
 
 extension [A0, A1, A2, A3, A4, A5, A6, A7, A8](
-    tuple: (
-        EnvRead[A0],
-        EnvRead[A1],
-        EnvRead[A2],
-        EnvRead[A3],
-        EnvRead[A4],
-        EnvRead[A5],
-        EnvRead[A6],
-        EnvRead[A7],
-        EnvRead[A8]
-    )
+    tuple: (EnvRead[A0], EnvRead[A1], EnvRead[A2], EnvRead[A3], EnvRead[A4], EnvRead[A5], EnvRead[A6], EnvRead[A7], EnvRead[A8])
 )
   def mapN[B](f: (A0, A1, A2, A3, A4, A5, A6, A7, A8) => B): EnvRead[B] =
     new EnvRead[B]:
@@ -172,18 +139,7 @@ extension [A0, A1, A2, A3, A4, A5, A6, A7, A8](
           }
 
 extension [A0, A1, A2, A3, A4, A5, A6, A7, A8, A9](
-    tuple: (
-        EnvRead[A0],
-        EnvRead[A1],
-        EnvRead[A2],
-        EnvRead[A3],
-        EnvRead[A4],
-        EnvRead[A5],
-        EnvRead[A6],
-        EnvRead[A7],
-        EnvRead[A8],
-        EnvRead[A9]
-    )
+    tuple: (EnvRead[A0], EnvRead[A1], EnvRead[A2], EnvRead[A3], EnvRead[A4], EnvRead[A5], EnvRead[A6], EnvRead[A7], EnvRead[A8], EnvRead[A9])
 )
   def mapN[B](f: (A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) => B): EnvRead[B] =
     new EnvRead[B]:
@@ -205,19 +161,7 @@ extension [A0, A1, A2, A3, A4, A5, A6, A7, A8, A9](
           }
 
 extension [A0, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10](
-    tuple: (
-        EnvRead[A0],
-        EnvRead[A1],
-        EnvRead[A2],
-        EnvRead[A3],
-        EnvRead[A4],
-        EnvRead[A5],
-        EnvRead[A6],
-        EnvRead[A7],
-        EnvRead[A8],
-        EnvRead[A9],
-        EnvRead[A10]
-    )
+    tuple: (EnvRead[A0], EnvRead[A1], EnvRead[A2], EnvRead[A3], EnvRead[A4], EnvRead[A5], EnvRead[A6], EnvRead[A7], EnvRead[A8], EnvRead[A9], EnvRead[A10])
 )
   def mapN[B](
       f: (A0, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10) => B
@@ -237,9 +181,6 @@ extension [A0, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10](
           .product(r9.read(values))
           .product(r10.read(values))
           .mapResult {
-            case (
-                  (((((((((a0, a1), a2), a3), a4), a5), a6), a7), a8), a9),
-                  a10
-                ) =>
+            case ((((((((((a0, a1), a2), a3), a4), a5), a6), a7), a8), a9), a10) =>
               f(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10)
           }
