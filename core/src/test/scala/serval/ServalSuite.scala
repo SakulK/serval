@@ -17,6 +17,7 @@
 package serval
 
 import munit.*
+import scala.concurrent.duration.*
 
 class ServalSuite extends FunSuite {
 
@@ -104,6 +105,24 @@ class ServalSuite extends FunSuite {
 
   test("TwoValues parse error") {
     val result = load[TwoValues](Map("CONFIG_A" -> "a", "CONFIG_B" -> "b"))
+    assert(result.isLeft)
+  }
+
+  case class DurationNewtype(d: FiniteDuration)
+  given EnvParse[String, DurationNewtype] =
+    EnvParse[String, FiniteDuration].mapParse(DurationNewtype.apply)
+
+  case class WithNewtype(d: DurationNewtype)
+  given EnvRead[WithNewtype] =
+    env("DURATION").as[DurationNewtype].map(WithNewtype.apply)
+
+  test("WithNewtype duration success") {
+    val result = load[WithNewtype](Map("DURATION" -> "5 seconds"))
+    assertEquals(result, Right(WithNewtype(DurationNewtype(5.seconds))))
+  }
+
+  test("WithNewtype duration parse error") {
+    val result = load[WithNewtype](Map("DURATION" -> "not a duration"))
     assert(result.isLeft)
   }
 }

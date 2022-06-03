@@ -25,46 +25,42 @@ enum EnvLoadResult[+A]:
   case Success(name: String, value: A) extends EnvLoadResult[A]
   case Failure(error: EnvLoadError) extends EnvLoadResult[Nothing]
 
+import EnvLoadError.*
+import EnvLoadResult.*
+
 extension [A](ra: EnvLoadResult[A])
   def product[B](rb: EnvLoadResult[B]): EnvLoadResult[(A, B)] =
     (ra, rb) match {
-      case (
-            EnvLoadResult.Success(nameA, valueA),
-            EnvLoadResult.Success(nameB, valueB)
-          ) =>
-        EnvLoadResult.Success(s"$nameA, $nameB", (valueA, valueB))
+      case (Success(nameA, valueA), Success(nameB, valueB)) =>
+        Success(s"$nameA, $nameB", (valueA, valueB))
 
-      case (failure: EnvLoadResult.Failure, _: EnvLoadResult.Success[?]) =>
+      case (failure: Failure, _: Success[?]) =>
         failure
 
-      case (_: EnvLoadResult.Success[?], failure: EnvLoadResult.Failure) =>
+      case (_: Success[?], failure: Failure) =>
         failure
 
-      case (EnvLoadResult.Failure(error1), EnvLoadResult.Failure(error2)) =>
-        EnvLoadResult.Failure(combineErrors(error1, error2))
+      case (Failure(error1), Failure(error2)) =>
+        Failure(combineErrors(error1, error2))
     }
 
   def mapResult[B](f: A => B): EnvLoadResult[B] =
     ra match {
-      case EnvLoadResult.Success(name, value) =>
-        EnvLoadResult.Success(name, f(value))
-      case failure: EnvLoadResult.Failure => failure
+      case Success(name, value) => Success(name, f(value))
+      case failure: Failure     => failure
     }
 
 def combineErrors(error1: EnvLoadError, error2: EnvLoadError): EnvLoadError =
   (error1, error2) match {
-    case (
-          EnvLoadError.AggregatedErrors(list1),
-          EnvLoadError.AggregatedErrors(list2)
-        ) =>
-      EnvLoadError.AggregatedErrors(list1 ++ list2)
+    case (AggregatedErrors(list1), AggregatedErrors(list2)) =>
+      AggregatedErrors(list1 ++ list2)
 
-    case (EnvLoadError.AggregatedErrors(list), other) =>
-      EnvLoadError.AggregatedErrors(other :: list)
+    case (AggregatedErrors(list), other) =>
+      AggregatedErrors(other :: list)
 
-    case (other, EnvLoadError.AggregatedErrors(list)) =>
-      EnvLoadError.AggregatedErrors(other :: list)
+    case (other, AggregatedErrors(list)) =>
+      AggregatedErrors(other :: list)
 
     case (error1, error2) =>
-      EnvLoadError.AggregatedErrors(List(error1, error2))
+      AggregatedErrors(List(error1, error2))
   }

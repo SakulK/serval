@@ -16,6 +16,9 @@
 
 package serval
 
+import scala.concurrent.duration.{Duration, FiniteDuration}
+import scala.util.Try
+
 trait EnvParse[A, B]:
   def parse(input: A): Either[String, B]
 
@@ -23,9 +26,30 @@ object EnvParse:
 
   def apply[A, B](using envParse: EnvParse[A, B]): EnvParse[A, B] = envParse
 
-  given EnvParse[String, Int] with
-    def parse(input: String): Either[String, Int] =
-      input.toIntOption match {
-        case Some(value) => Right(value)
-        case None        => Left(s"Failed to parse Int from \"$input\"")
-      }
+  def fromOption[A, B](typeName: String)(f: A => Option[B]): EnvParse[A, B] =
+    new EnvParse[A, B]:
+      def parse(input: A): Either[String, B] =
+        f(input) match {
+          case Some(value) => Right(value)
+          case None        => Left(s"Failed to parse $typeName from \"$input\"")
+        }
+
+  def fromEither[A, B](f: A => Either[String, B]): EnvParse[A, B] =
+    new EnvParse[A, B]:
+      def parse(input: A): Either[String, B] = f(input)
+
+  given EnvParse[String, Int] = fromOption("Int")(_.toIntOption)
+  given EnvParse[String, Double] = fromOption("Double")(_.toDoubleOption)
+  given EnvParse[String, Float] = fromOption("Float")(_.toFloatOption)
+  given EnvParse[String, Duration] =
+    fromOption("Duration")(s => Try(Duration(s)).toOption)
+  given EnvParse[String, FiniteDuration] =
+    fromOption("FiniteDuration") { s =>
+      Try(Duration(s)).toOption.collect { case fd: FiniteDuration => fd }
+    }
+
+extension [A, B](envParse: EnvParse[A, B])
+  def mapParse[C](f: B => C): EnvParse[A, C] =
+    new EnvParse[A, C]:
+      def parse(input: A): Either[String, C] =
+        envParse.parse(input).map(f)
