@@ -14,10 +14,18 @@
  * limitations under the License.
  */
 
-package serval
+package serval.read
 
 trait EnvRead[T]:
   def read(values: Map[String, String]): EnvLoadResult[T]
+
+def env(name: String): EnvRead[String] =
+  new EnvRead[String]:
+    def read(values: Map[String, String]): EnvLoadResult[String] =
+      values.get(name) match {
+        case Some(value) => EnvLoadResult.Success(name, value)
+        case None        => EnvLoadResult.Failure(EnvLoadError.Missing(name))
+      }
 
 object EnvRead:
   def apply[T](using envRead: EnvRead[T]): EnvRead[T] =

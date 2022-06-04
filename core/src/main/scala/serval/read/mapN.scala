@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package serval
+package serval.read
 
 // format: off
 given EnvReadMapNExtensions: {} with {

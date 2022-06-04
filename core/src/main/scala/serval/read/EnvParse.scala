@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package serval
+package serval.read
 
 import scala.concurrent.duration.{Duration, FiniteDuration}
 import scala.util.Try

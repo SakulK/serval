@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package serval
+package serval.read
 
 enum EnvLoadError:
   case Missing(name: String) extends EnvLoadError

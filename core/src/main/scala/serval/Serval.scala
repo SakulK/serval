@@ -16,13 +16,7 @@
 
 package serval
 
-def env(name: String): EnvRead[String] =
-  new EnvRead[String]:
-    def read(values: Map[String, String]): EnvLoadResult[String] =
-      values.get(name) match {
-        case Some(value) => EnvLoadResult.Success(name, value)
-        case None        => EnvLoadResult.Failure(EnvLoadError.Missing(name))
-      }
+import serval.read.{EnvRead, EnvLoadResult, EnvLoadError}
 
 def load[T: EnvRead](values: Map[String, String]): Either[String, T] =
   EnvRead[T].read(values) match {

@@ -18,6 +18,7 @@ package serval
 
 import munit.*
 import scala.concurrent.duration.*
+import serval.read.{given, *}
 
 class ServalSuite extends FunSuite {
 
