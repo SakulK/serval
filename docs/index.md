@@ -8,6 +8,6 @@ To use the latest version, include the following in your `build.sbt`:
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.github.sakulk" %% "serval" % "@VERSION@"
+  "io.github.sakulk" %% "serval" % "@VERSION@"
 )
 ```

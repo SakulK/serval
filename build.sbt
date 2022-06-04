@@ -1,7 +1,7 @@
 // https://typelevel.org/sbt-typelevel/faq.html#what-is-a-base-version-anyway
 ThisBuild / tlBaseVersion := "0.0" // your current series x.y
 
-ThisBuild / organization := "com.github.sakulk"
+ThisBuild / organization := "io.github.sakulk"
 ThisBuild / organizationName := "serval"
 ThisBuild / licenses := Seq(License.Apache2)
 ThisBuild / developers := List(
