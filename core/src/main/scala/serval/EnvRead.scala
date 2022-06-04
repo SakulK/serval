@@ -23,45 +23,47 @@ object EnvRead:
   def apply[T](using envRead: EnvRead[T]): EnvRead[T] =
     envRead
 
-extension [A](envRead: EnvRead[A])
-  def map[B](f: A => B): EnvRead[B] =
-    new EnvRead[B]:
-      def read(values: Map[String, String]): EnvLoadResult[B] =
-        envRead.read(values) match {
-          case EnvLoadResult.Success(name, value) =>
-            EnvLoadResult.Success(name, f(value))
-          case f: EnvLoadResult.Failure => f
-        }
+given EnvReadExtensions: {} with {
+  extension [A](envRead: EnvRead[A])
+    def map[B](f: A => B): EnvRead[B] =
+      new EnvRead[B]:
+        def read(values: Map[String, String]): EnvLoadResult[B] =
+          envRead.read(values) match {
+            case EnvLoadResult.Success(name, value) =>
+              EnvLoadResult.Success(name, f(value))
+            case f: EnvLoadResult.Failure => f
+          }
 
-  def as[B](using envParse: EnvParse[A, B]): EnvRead[B] =
-    new EnvRead[B]:
-      def read(values: Map[String, String]): EnvLoadResult[B] =
-        envRead.read(values) match {
-          case EnvLoadResult.Success(name, value) =>
-            envParse.parse(value) match {
-              case Right(parsed) => EnvLoadResult.Success(name, parsed)
-              case Left(error) =>
-                EnvLoadResult.Failure(EnvLoadError.ParseError(name, error))
-            }
-          case f: EnvLoadResult.Failure => f
-        }
+    def as[B](using envParse: EnvParse[A, B]): EnvRead[B] =
+      new EnvRead[B]:
+        def read(values: Map[String, String]): EnvLoadResult[B] =
+          envRead.read(values) match {
+            case EnvLoadResult.Success(name, value) =>
+              envParse.parse(value) match {
+                case Right(parsed) => EnvLoadResult.Success(name, parsed)
+                case Left(error) =>
+                  EnvLoadResult.Failure(EnvLoadError.ParseError(name, error))
+              }
+            case f: EnvLoadResult.Failure => f
+          }
 
-  def or(other: EnvRead[A]): EnvRead[A] =
-    new EnvRead[A]:
-      def read(values: Map[String, String]): EnvLoadResult[A] =
-        envRead.read(values) match {
-          case s: EnvLoadResult.Success[A] => s
-          case EnvLoadResult.Failure(_: EnvLoadError.Missing) =>
-            other.read(values)
-          case f: EnvLoadResult.Failure => f
-        }
+    def or(other: EnvRead[A]): EnvRead[A] =
+      new EnvRead[A]:
+        def read(values: Map[String, String]): EnvLoadResult[A] =
+          envRead.read(values) match {
+            case s: EnvLoadResult.Success[A] => s
+            case EnvLoadResult.Failure(_: EnvLoadError.Missing) =>
+              other.read(values)
+            case f: EnvLoadResult.Failure => f
+          }
 
-  def default(value: A): EnvRead[A] =
-    new EnvRead[A]:
-      def read(values: Map[String, String]): EnvLoadResult[A] =
-        envRead.read(values) match {
-          case s: EnvLoadResult.Success[A] => s
-          case EnvLoadResult.Failure(_: EnvLoadError.Missing) =>
-            EnvLoadResult.Success("<default>", value)
-          case f: EnvLoadResult.Failure => f
-        }
+    def default(value: A): EnvRead[A] =
+      new EnvRead[A]:
+        def read(values: Map[String, String]): EnvLoadResult[A] =
+          envRead.read(values) match {
+            case s: EnvLoadResult.Success[A] => s
+            case EnvLoadResult.Failure(_: EnvLoadError.Missing) =>
+              EnvLoadResult.Success("<default>", value)
+            case f: EnvLoadResult.Failure => f
+          }
+}

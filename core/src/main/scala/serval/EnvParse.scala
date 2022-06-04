@@ -48,8 +48,10 @@ object EnvParse:
       Try(Duration(s)).toOption.collect { case fd: FiniteDuration => fd }
     }
 
-extension [A, B](envParse: EnvParse[A, B])
-  def mapParse[C](f: B => C): EnvParse[A, C] =
-    new EnvParse[A, C]:
-      def parse(input: A): Either[String, C] =
-        envParse.parse(input).map(f)
+given EnvParseExtensions: {} with {
+  extension [A, B](envParse: EnvParse[A, B])
+    def map[C](f: B => C): EnvParse[A, C] =
+      new EnvParse[A, C]:
+        def parse(input: A): Either[String, C] =
+          envParse.parse(input).map(f)
+}

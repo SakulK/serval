@@ -110,7 +110,7 @@ class ServalSuite extends FunSuite {
 
   case class DurationNewtype(d: FiniteDuration)
   given EnvParse[String, DurationNewtype] =
-    EnvParse[String, FiniteDuration].mapParse(DurationNewtype.apply)
+    EnvParse[String, FiniteDuration].map(DurationNewtype.apply)
 
   case class WithNewtype(d: DurationNewtype)
   given EnvRead[WithNewtype] =

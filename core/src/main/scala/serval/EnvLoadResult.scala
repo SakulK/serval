@@ -28,27 +28,29 @@ enum EnvLoadResult[+A]:
 import EnvLoadError.*
 import EnvLoadResult.*
 
-extension [A](ra: EnvLoadResult[A])
-  def product[B](rb: EnvLoadResult[B]): EnvLoadResult[(A, B)] =
-    (ra, rb) match {
-      case (Success(nameA, valueA), Success(nameB, valueB)) =>
-        Success(s"$nameA, $nameB", (valueA, valueB))
+given EnvLoadResultExtensions: {} with {
+  extension [A](ra: EnvLoadResult[A])
+    def product[B](rb: EnvLoadResult[B]): EnvLoadResult[(A, B)] =
+      (ra, rb) match {
+        case (Success(nameA, valueA), Success(nameB, valueB)) =>
+          Success(s"$nameA, $nameB", (valueA, valueB))
 
-      case (failure: Failure, _: Success[?]) =>
-        failure
+        case (failure: Failure, _: Success[?]) =>
+          failure
 
-      case (_: Success[?], failure: Failure) =>
-        failure
+        case (_: Success[?], failure: Failure) =>
+          failure
 
-      case (Failure(error1), Failure(error2)) =>
-        Failure(combineErrors(error1, error2))
-    }
+        case (Failure(error1), Failure(error2)) =>
+          Failure(combineErrors(error1, error2))
+      }
 
-  def mapResult[B](f: A => B): EnvLoadResult[B] =
-    ra match {
-      case Success(name, value) => Success(name, f(value))
-      case failure: Failure     => failure
-    }
+    def mapResult[B](f: A => B): EnvLoadResult[B] =
+      ra match {
+        case Success(name, value) => Success(name, f(value))
+        case failure: Failure     => failure
+      }
+}
 
 def combineErrors(error1: EnvLoadError, error2: EnvLoadError): EnvLoadError =
   (error1, error2) match {
