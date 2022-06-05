@@ -24,7 +24,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Pure)
   .in(file("core"))
   .settings(
-    name := "serval",
+    name := "serval-core",
     libraryDependencies ++= Seq(
       "org.scalameta" %%% "munit" % "0.7.29" % Test
     )
