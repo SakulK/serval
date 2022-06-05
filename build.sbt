@@ -38,4 +38,12 @@ lazy val legacy = crossProject(JVMPlatform, JSPlatform)
   )
   .dependsOn(core)
 
-lazy val docs = project.in(file("site")).enablePlugins(TypelevelSitePlugin)
+lazy val docs = project
+  .in(file("site"))
+  .enablePlugins(TypelevelSitePlugin)
+  .settings(
+    tlSiteRelatedProjects := Seq(
+      "Ciris" -> url("https://cir.is/")
+    )
+  )
+  .dependsOn(legacy.jvm)

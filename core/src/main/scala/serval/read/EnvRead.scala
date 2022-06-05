@@ -65,8 +65,14 @@ given EnvReadExtensions: {} with {
         def read(values: Map[String, String]): EnvLoadResult[A] =
           envRead.read(values) match {
             case s: EnvLoadResult.Success[A] => s
-            case EnvLoadResult.Failure(_: EnvLoadError.Missing) =>
-              other.read(values)
+            case EnvLoadResult.Failure(EnvLoadError.Missing(name)) =>
+              other.read(values) match {
+                case EnvLoadResult.Failure(EnvLoadError.Missing(otherName)) =>
+                  EnvLoadResult.Failure(
+                    EnvLoadError.Missing(s"$name|$otherName")
+                  )
+                case result => result
+              }
             case f: EnvLoadResult.Failure => f
           }
 

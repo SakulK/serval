@@ -27,8 +27,8 @@ object EnvLoadException {
 
   def renderError(error: EnvLoadError): String =
     error match {
-      case EnvLoadError.Missing(name)           => s" - $name Variable missing"
-      case EnvLoadError.ParseError(name, error) => s" - $name $error"
+      case EnvLoadError.Missing(name)           => s" - $name: Variable missing"
+      case EnvLoadError.ParseError(name, error) => s" - $name: $error"
       case EnvLoadError.AggregatedErrors(errors) =>
         errors.map(renderError).mkString("\n")
     }
