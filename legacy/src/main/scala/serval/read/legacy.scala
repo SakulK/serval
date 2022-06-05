@@ -24,6 +24,7 @@ object legacy:
   def EnvParse = serval.read.EnvParse
 
   def env(name: String): EnvRead[String] = serval.read.env(name)
+  def pure[T](value: T): EnvRead[T] = serval.read.pure(value)
 
   implicit class EnvReadOps[A](private val envRead: EnvRead[A]) extends AnyVal:
     def map[B](f: A => B): EnvRead[B] = envRead.map(f)

@@ -126,4 +126,16 @@ class ServalSuite extends FunSuite {
     val result = load[WithNewtype](Map("DURATION" -> "not a duration"))
     assert(result.isLeft)
   }
+
+  case class PureValues(a: String, b: Int)
+  given EnvRead[PureValues] =
+    (
+      pure("text"),
+      pure(5)
+    ).mapN(PureValues.apply)
+
+  test("PureValues") {
+    val result = load[PureValues](Map.empty)
+    assertEquals(result, Right(PureValues("text", 5)))
+  }
 }

@@ -27,6 +27,11 @@ def env(name: String): EnvRead[String] =
         case None        => EnvLoadResult.Failure(EnvLoadError.Missing(name))
       }
 
+def pure[T](value: T): EnvRead[T] =
+  new EnvRead[T]:
+    def read(values: Map[String, String]): EnvLoadResult[T] =
+      EnvLoadResult.Success("<pure>", value)
+
 object EnvRead:
   def apply[T](using envRead: EnvRead[T]): EnvRead[T] =
     envRead
