@@ -18,14 +18,13 @@ package serval
 
 import serval.read.{EnvRead, EnvLoadResult, EnvLoadError}
 
-def load[T: EnvRead](values: Map[String, String]): Either[String, T] =
+def load[T: EnvRead](values: Map[String, String]): Either[EnvLoadException, T] =
   EnvRead[T].read(values) match {
     case EnvLoadResult.Success(name, value) =>
       Right(value)
-    case EnvLoadResult.Failure(EnvLoadError.Missing(name)) =>
-      Left(s"Missing $name")
-    case EnvLoadResult.Failure(EnvLoadError.ParseError(name, error)) =>
-      Left(s"Error while parsing $name: $error")
-    case EnvLoadResult.Failure(EnvLoadError.AggregatedErrors(errors)) =>
-      Left(s"Errors: $errors")
+    case EnvLoadResult.Failure(error) =>
+      Left(EnvLoadException(error))
   }
+
+def loadOrThrow[T: EnvRead](values: Map[String, String]): T =
+  load[T](values).fold(throw _, identity)

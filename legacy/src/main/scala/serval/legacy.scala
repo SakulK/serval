@@ -19,5 +19,10 @@ package serval
 import serval.read.EnvRead
 
 object legacy:
-  def load[T: EnvRead](values: Map[String, String]): Either[String, T] =
+  def load[T: EnvRead](
+      values: Map[String, String]
+  ): Either[EnvLoadException, T] =
     serval.load[T](values)
+
+  def loadOrThrow[T: EnvRead](values: Map[String, String]): T =
+    serval.loadOrThrow[T](values)
