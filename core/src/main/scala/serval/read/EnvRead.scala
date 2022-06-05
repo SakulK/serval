@@ -79,4 +79,24 @@ given EnvReadExtensions: {} with {
               EnvLoadResult.Success("<default>", value)
             case f: EnvLoadResult.Failure => f
           }
+
+    def secret: EnvRead[Secret[A]] =
+      new EnvRead[Secret[A]]:
+        def read(values: Map[String, String]): EnvLoadResult[Secret[A]] =
+          envRead.read(values) match {
+            case EnvLoadResult.Success(name, value) =>
+              EnvLoadResult.Success(name, Secret(value))
+            case f @ EnvLoadResult.Failure(EnvLoadError.Missing(_)) => f
+            case EnvLoadResult.Failure(e: EnvLoadError.ParseError) =>
+              EnvLoadResult.Failure(
+                EnvLoadError.ParseError(e.name, "Failed to parse secret value")
+              )
+            case EnvLoadResult.Failure(e: EnvLoadError.AggregatedErrors) =>
+              EnvLoadResult.Failure(
+                EnvLoadError.ParseError(
+                  "",
+                  "Multiple errors while loading secret value"
+                )
+              )
+          }
 }

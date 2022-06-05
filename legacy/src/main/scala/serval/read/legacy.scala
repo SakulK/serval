@@ -31,6 +31,7 @@ object legacy:
     def as[B](using envParse: EnvParse[A, B]): EnvRead[B] = envRead.as[B]
     def or(other: EnvRead[A]): EnvRead[A] = envRead.or(other)
     def default(value: A): EnvRead[A] = envRead.default(value)
+    def secret: EnvRead[Secret[A]] = envRead.secret
 
   implicit class EnvParseOps[A, B](envParse: EnvParse[A, B]) extends AnyVal:
     def map[C](f: B => C): EnvParse[A, C] = envParse.map(f)

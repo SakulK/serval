@@ -138,4 +138,16 @@ class ServalSuite extends FunSuite {
     val result = load[PureValues](Map.empty)
     assertEquals(result, Right(PureValues("text", 5)))
   }
+
+  case class SecretConfig(key: Secret[String])
+  given EnvRead[SecretConfig] = env("KEY").secret.map(SecretConfig.apply)
+
+  test("SecretConfig") {
+    val result = load[SecretConfig](Map("KEY" -> "123"))
+    assertEquals(result, Right(SecretConfig(Secret("123"))))
+  }
+
+  test("Secret toString") {
+    assertEquals(SecretConfig(Secret("123")).toString, "SecretConfig(<secret>)")
+  }
 }
