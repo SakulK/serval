@@ -18,7 +18,7 @@ ThisBuild / tlSitePublishBranch := Some("main")
 val Scala3 = "3.1.2"
 ThisBuild / scalaVersion := Scala3
 
-lazy val root = tlCrossRootProject.aggregate(core)
+lazy val root = tlCrossRootProject.aggregate(core, legacy)
 
 lazy val core = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Pure)
@@ -29,5 +29,13 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       "org.scalameta" %%% "munit" % "0.7.29" % Test
     )
   )
+
+lazy val legacy = crossProject(JVMPlatform, JSPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("legacy"))
+  .settings(
+    name := "serval-legacy"
+  )
+  .dependsOn(core)
 
 lazy val docs = project.in(file("site")).enablePlugins(TypelevelSitePlugin)
