@@ -67,7 +67,7 @@
       <ul class="nav-list">
         <li class="level1 nav-header">Related Projects</li>
         
-          <li class="level2"><a href="https://typelevel.org/cats/">cats</a></li>
+          <li class="level2"><a href="https://cir.is/">Ciris</a></li>
         
       </ul>
 
@@ -80,6 +80,7 @@
 
         <ul class="nav-list">
           <li class="level1"><a href="#usage">Usage</a></li>
+          <li class="level1"><a href="#minimal-example">Minimal example</a></li>
         </ul>
 
         <p class="footer"></p>
@@ -88,12 +89,71 @@
       <main class="content">
 
         <h1 id="serval" class="title">serval</h1>
+        <p><strong>S</strong>imple <strong>E</strong>nvironment <strong>R</strong>ead <strong>VAL</strong>ues (yes, I tried my best to come up with a name that&#39;s also an animal) - Scala library to read variables defined in ENV, inspired by <a href="https://cir.is/">Ciris</a> which is awesome and I cannot recommend it enough.
+        I wanted to replicate the experience of using Ciris to read ENV variables but in applications that (unfortunately) don&#39;t use cats-effect. Serval has zero dependencies and it&#39;s sole purpose is to read a <code>Map[String, String]</code> (like <code>sys.env</code>) into user-defined config case class(es).</p>
         
         <h3 id="usage" class="section">Usage<a class="anchor-link right" href="#usage"><i class="icofont-laika">&#xef71;</i></a></h3>
-        <p>This library is currently available for Scala binary versions 3.1, but can be used in 2.13 with tasty reader enabled.</p>
-        <p>To use the latest version, include the following in your <code>build.sbt</code>:</p>
+        <p>This library is written in Scala 3 (mostly because I wanted to try it out) but can be used from 2.13.6+</p>
+        <p>To use the latest version in a Scala 3 project, include the following in your <code>build.sbt</code>:</p>
         <pre class="keep-together pdf epub"><code class="nohighlight"><span class="identifier">libraryDependencies</span><span> ++= </span><span class="type-name">Seq</span><span>(
-  </span><span class="string-literal">&quot;io.github.sakulk&quot;</span><span> %% </span><span class="string-literal">&quot;serval&quot;</span><span> % </span><span class="string-literal">&quot;0.0-00c3d4c-SNAPSHOT&quot;</span><span>
+  </span><span class="string-literal">&quot;io.github.sakulk&quot;</span><span> %% </span><span class="string-literal">&quot;serval-core&quot;</span><span> % </span><span class="string-literal">&quot;0.0-bf5d83b-SNAPSHOT&quot;</span><span>
+)</span></code></pre>
+        <p>For Scala 2.13.6+ you need to add the <code>-Ytasty-reader</code> to your projects <code>scalacOptions</code> and include the following dependency:</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="identifier">libraryDependencies</span><span> ++= </span><span class="type-name">Seq</span><span>(
+  </span><span class="string-literal">&quot;io.github.sakulk&quot;</span><span> %% </span><span class="string-literal">&quot;serval-legacy&quot;</span><span> % </span><span class="string-literal">&quot;0.0-bf5d83b-SNAPSHOT&quot;</span><span>
+)</span></code></pre>
+        
+        <h3 id="minimal-example" class="section">Minimal example<a class="anchor-link right" href="#minimal-example"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <p>Scala 3:</p>
+        <pre><code class="nohighlight"><span class="keyword">case</span><span> </span><span class="keyword">class</span><span> </span><span class="type-name">MyConfig</span><span>(</span><span class="identifier">foo</span><span>: </span><span class="type-name">String</span><span>, </span><span class="identifier">bar</span><span>: </span><span class="type-name">Int</span><span>, </span><span class="identifier">baz</span><span>: </span><span class="type-name">String</span><span>)
+
+</span><span class="keyword">object</span><span> </span><span class="type-name">MyConfig</span><span>:
+  </span><span class="keyword">import</span><span> </span><span class="identifier">serval</span><span>.</span><span class="identifier">read</span><span>.{</span><span class="keyword">given</span><span>, *}
+  </span><span class="keyword">given</span><span> </span><span class="type-name">EnvRead</span><span>[</span><span class="type-name">MyConfig</span><span>] =
+    (
+      </span><span class="identifier">env</span><span>(</span><span class="string-literal">&quot;CONFIG_FOO&quot;</span><span>).</span><span class="identifier">or</span><span>(</span><span class="identifier">env</span><span>(</span><span class="string-literal">&quot;CONFIG_FOO_2&quot;</span><span>)),
+      </span><span class="identifier">env</span><span>(</span><span class="string-literal">&quot;CONFIG_BAR&quot;</span><span>).</span><span class="identifier">as</span><span>[</span><span class="type-name">Int</span><span>],
+      </span><span class="identifier">env</span><span>(</span><span class="string-literal">&quot;CONFIG_BAZ&quot;</span><span>).</span><span class="identifier">default</span><span>(</span><span class="string-literal">&quot;bazinga&quot;</span><span>)
+    ).</span><span class="identifier">mapN</span><span>(</span><span class="type-name">MyConfig</span><span>.</span><span class="identifier">apply</span><span>)
+
+</span><span class="identifier">serval</span><span>.</span><span class="identifier">load</span><span>[</span><span class="type-name">MyConfig</span><span>](
+  </span><span class="comment">// use sys.env to load real ENV variables
+</span><span>  </span><span class="type-name">Map</span><span>(
+    </span><span class="string-literal">&quot;CONFIG_FOO&quot;</span><span> -&gt; </span><span class="string-literal">&quot;foo&quot;</span><span>,
+    </span><span class="string-literal">&quot;CONFIG_BAR&quot;</span><span> -&gt; </span><span class="string-literal">&quot;42&quot;</span><span>
+  )
+)
+</span><span class="comment">// res0: Either[EnvLoadException, MyConfig] = Right(
+//   MyConfig(&quot;foo&quot;, 42, &quot;bazinga&quot;)
+// )
+</span><span>
+</span><span class="identifier">serval</span><span>.</span><span class="identifier">load</span><span>[</span><span class="type-name">MyConfig</span><span>](
+  </span><span class="type-name">Map</span><span>(</span><span class="string-literal">&quot;CONFIG_BAR&quot;</span><span> -&gt; </span><span class="string-literal">&quot;bar&quot;</span><span>)
+)
+</span><span class="comment">// res1: Either[EnvLoadException, MyConfig] = Left(
+//   serval.EnvLoadException: Failed to load config from environment:
+//  - CONFIG_FOO|CONFIG_FOO_2: Variable missing
+//  - CONFIG_BAR: Failed to parse Int from &quot;bar&quot;
+// )</span></code></pre>
+        <p>Scala 2.13:</p>
+        <pre><code class="nohighlight"><span class="keyword">case</span><span> </span><span class="keyword">class</span><span> </span><span class="type-name">MyConfig</span><span>(</span><span class="identifier">foo</span><span>: </span><span class="type-name">String</span><span>, </span><span class="identifier">bar</span><span>: </span><span class="type-name">Int</span><span>, </span><span class="identifier">baz</span><span>: </span><span class="type-name">String</span><span>)
+
+</span><span class="keyword">object</span><span> </span><span class="type-name">MyConfig</span><span> {
+  </span><span class="keyword">import</span><span> </span><span class="identifier">serval</span><span>.</span><span class="identifier">read</span><span>.</span><span class="identifier">legacy</span><span>.</span><span class="identifier">_</span><span>
+  </span><span class="keyword">implicit</span><span> </span><span class="keyword">val</span><span> </span><span class="identifier">envRead</span><span>: </span><span class="type-name">EnvRead</span><span>[</span><span class="type-name">MyConfig</span><span>] =
+    (
+      </span><span class="identifier">env</span><span>(</span><span class="string-literal">&quot;CONFIG_FOO&quot;</span><span>).</span><span class="identifier">or</span><span>(</span><span class="identifier">env</span><span>(</span><span class="string-literal">&quot;CONFIG_FOO_2&quot;</span><span>)),
+      </span><span class="identifier">env</span><span>(</span><span class="string-literal">&quot;CONFIG_BAR&quot;</span><span>).</span><span class="identifier">as</span><span>[</span><span class="type-name">Int</span><span>],
+      </span><span class="identifier">env</span><span>(</span><span class="string-literal">&quot;CONFIG_BAZ&quot;</span><span>).</span><span class="identifier">default</span><span>(</span><span class="string-literal">&quot;bazinga&quot;</span><span>)
+    ).</span><span class="identifier">mapN</span><span>(</span><span class="type-name">MyConfig</span><span>.</span><span class="identifier">apply</span><span>)
+}
+
+</span><span class="identifier">serval</span><span>.</span><span class="identifier">legacy</span><span>.</span><span class="identifier">load</span><span>[</span><span class="type-name">MyConfig</span><span>](
+  </span><span class="comment">// use sys.env to load real ENV variables
+</span><span>  </span><span class="type-name">Map</span><span>(
+    </span><span class="string-literal">&quot;CONFIG_FOO&quot;</span><span> -&gt; </span><span class="string-literal">&quot;foo&quot;</span><span>,
+    </span><span class="string-literal">&quot;CONFIG_BAR&quot;</span><span> -&gt; </span><span class="string-literal">&quot;42&quot;</span><span>
+  )
 )</span></code></pre>
 
         <hr style="margin-top: 30px"/>
