@@ -96,11 +96,11 @@
         <p>This library is written in Scala 3 (mostly because I wanted to try it out) but can be used from 2.13.6+</p>
         <p>To use the latest version in a Scala 3 project, include the following in your <code>build.sbt</code>:</p>
         <pre class="keep-together pdf epub"><code class="nohighlight"><span class="identifier">libraryDependencies</span><span> ++= </span><span class="type-name">Seq</span><span>(
-  </span><span class="string-literal">&quot;io.github.sakulk&quot;</span><span> %% </span><span class="string-literal">&quot;serval-core&quot;</span><span> % </span><span class="string-literal">&quot;0.0-bf5d83b-SNAPSHOT&quot;</span><span>
+  </span><span class="string-literal">&quot;io.github.sakulk&quot;</span><span> %% </span><span class="string-literal">&quot;serval-core&quot;</span><span> % </span><span class="string-literal">&quot;0.1.0&quot;</span><span>
 )</span></code></pre>
         <p>For Scala 2.13.6+ you need to add the <code>-Ytasty-reader</code> to your projects <code>scalacOptions</code> and include the following dependency:</p>
         <pre class="keep-together pdf epub"><code class="nohighlight"><span class="identifier">libraryDependencies</span><span> ++= </span><span class="type-name">Seq</span><span>(
-  </span><span class="string-literal">&quot;io.github.sakulk&quot;</span><span> %% </span><span class="string-literal">&quot;serval-legacy&quot;</span><span> % </span><span class="string-literal">&quot;0.0-bf5d83b-SNAPSHOT&quot;</span><span>
+  </span><span class="string-literal">&quot;io.github.sakulk&quot;</span><span> %% </span><span class="string-literal">&quot;serval-legacy&quot;</span><span> % </span><span class="string-literal">&quot;0.1.0&quot;</span><span>
 )</span></code></pre>
         
         <h3 id="minimal-example" class="section">Minimal example<a class="anchor-link right" href="#minimal-example"><i class="icofont-laika">&#xef71;</i></a></h3>
@@ -154,7 +154,10 @@
     </span><span class="string-literal">&quot;CONFIG_FOO&quot;</span><span> -&gt; </span><span class="string-literal">&quot;foo&quot;</span><span>,
     </span><span class="string-literal">&quot;CONFIG_BAR&quot;</span><span> -&gt; </span><span class="string-literal">&quot;42&quot;</span><span>
   )
-)</span></code></pre>
+)
+</span><span class="comment">// res3: Either[EnvLoadException, MyConfig] = Right(
+//   MyConfig(&quot;foo&quot;, 42, &quot;bazinga&quot;)
+// )</span></code></pre>
 
         <hr style="margin-top: 30px"/>
         <footer style="font-size: 90%; text-align: center">
