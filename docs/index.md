@@ -54,7 +54,7 @@ serval.load[MyConfig](
 ```
 
 Scala 2.13:
-```scala
+```scala mdoc:reset
 case class MyConfig(foo: String, bar: Int, baz: String)
 
 object MyConfig {
