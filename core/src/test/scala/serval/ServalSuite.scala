@@ -153,12 +153,13 @@ class ServalSuite extends FunSuite {
 
   case class ListOfBoolConfig(list: List[Boolean])
   given EnvRead[ListOfBoolConfig] = env("BOOLS")
-    .map(_.split(",").toList)
+    .splitTrimAll(",")
     .asList[Boolean]
     .map(ListOfBoolConfig.apply)
 
   test("ListOfBool success") {
-    val result = load[ListOfBoolConfig](Map("BOOLS" -> "true,false,false,true"))
+    val result =
+      load[ListOfBoolConfig](Map("BOOLS" -> " true,false,false ,true"))
     assertEquals(
       result,
       Right(ListOfBoolConfig(List(true, false, false, true)))
@@ -168,5 +169,21 @@ class ServalSuite extends FunSuite {
   test("ListOfBool parse error") {
     val result = load[ListOfBoolConfig](Map("BOOLS" -> "true,foo,false"))
     assert(result.isLeft)
+  }
+
+  case class VariablesWithPrefix(list: List[String])
+  given EnvRead[VariablesWithPrefix] =
+    envWithPrefix("PREFIX_").map(VariablesWithPrefix.apply)
+
+  test("VariablesWithPrefix success") {
+    val result = load[VariablesWithPrefix](
+      Map("PREFIX_2" -> "2", "PREFIX_1" -> "1", "NOT_PREFIX_A" -> "foo")
+    )
+    assertEquals(result, Right(VariablesWithPrefix(List("1", "2"))))
+  }
+
+  test("VariablesWithPrefix empty") {
+    val result = load[VariablesWithPrefix](Map())
+    assertEquals(result, Right(VariablesWithPrefix(List())))
   }
 }

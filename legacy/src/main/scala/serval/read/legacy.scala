@@ -24,6 +24,8 @@ object legacy:
   val EnvParse = serval.read.EnvParse
 
   def env(name: String): EnvRead[String] = serval.read.env(name)
+  def envWithPrefix(prefix: String): EnvRead[List[String]] =
+    serval.read.envWithPrefix(prefix)
   def pure[T](value: T): EnvRead[T] = serval.read.pure(value)
 
   implicit class EnvReadOps[A](private val envRead: EnvRead[A]) extends AnyVal:
@@ -39,6 +41,13 @@ object legacy:
       extends AnyVal:
     def asList[B](using envParse: EnvParse[A, B]): EnvRead[List[B]] =
       EnvReadExtensions.asList(envRead)[B]
+
+  implicit class EnvReadStringOps(private val envRead: EnvRead[String])
+      extends AnyVal:
+    def split(delimiter: String): EnvRead[List[String]] =
+      EnvReadExtensions.split(envRead)(delimiter)
+    def splitTrimAll(delimiter: String): EnvRead[List[String]] =
+      EnvReadExtensions.splitTrimAll(envRead)(delimiter)
 
   implicit class EnvParseOps[A, B](envParse: EnvParse[A, B]) extends AnyVal:
     def map[C](f: B => C): EnvParse[A, C] = EnvParseExtensions.map(envParse)(f)

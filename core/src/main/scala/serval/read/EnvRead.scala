@@ -27,6 +27,18 @@ def env(name: String): EnvRead[String] =
         case None        => EnvLoadResult.Failure(EnvLoadError.Missing(name))
       }
 
+def envWithPrefix(prefix: String): EnvRead[List[String]] =
+  new EnvRead[List[String]]:
+    def read(values: Map[String, String]): EnvLoadResult[List[String]] =
+      EnvLoadResult.Success(
+        s"$prefix*",
+        values.view
+          .filter(_._1.startsWith(prefix))
+          .toList
+          .sortBy(_._1)
+          .map(_._2)
+      )
+
 def pure[T](value: T): EnvRead[T] =
   new EnvRead[T]:
     def read(values: Map[String, String]): EnvLoadResult[T] =
@@ -122,4 +134,11 @@ given EnvReadExtensions: {} with {
               }
             case f: EnvLoadResult.Failure => f
           }
+
+  extension (envRead: EnvRead[String])
+    def split(delimiter: String): EnvRead[List[String]] =
+      envRead.map(_.split(delimiter).toList)
+
+    def splitTrimAll(delimiter: String): EnvRead[List[String]] =
+      envRead.split(delimiter).map(_.map(_.trim))
 }
