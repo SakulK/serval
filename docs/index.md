@@ -1,6 +1,6 @@
 ## serval
 
-**S**imple **E**nvironment **R**ead **VAL**ues (yes, I tried my best to come up with a name that's also an animal) - Scala library to read variables defined in ENV, inspired by [Ciris](https://cir.is/) which is awesome and I cannot recommend it enough.
+**S**imple **E**nvironment **R**ead **VAL**ues (yes, I tried my best to come up with a name that's also an animal) - Scala library for reading variables defined in ENV, inspired by [Ciris](https://cir.is/) which is awesome and I cannot recommend it enough.
 I wanted to replicate the experience of using Ciris to read ENV variables but in applications that (unfortunately) don't use cats-effect. Serval has zero dependencies and it's sole purpose is to read a `Map[String, String]` (like `sys.env`) into user-defined config case class(es).
 
 
