@@ -35,6 +35,11 @@ object legacy:
       EnvReadExtensions.default(envRead)(value)
     def secret: EnvRead[Secret[A]] = EnvReadExtensions.secret(envRead)
 
+  implicit class EnvReadListOps[A](private val envRead: EnvRead[List[A]])
+      extends AnyVal:
+    def asList[B](using envParse: EnvParse[A, B]): EnvRead[List[B]] =
+      EnvReadExtensions.asList(envRead)[B]
+
   implicit class EnvParseOps[A, B](envParse: EnvParse[A, B]) extends AnyVal:
     def map[C](f: B => C): EnvParse[A, C] = EnvParseExtensions.map(envParse)(f)
  

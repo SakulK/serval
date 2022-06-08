@@ -150,4 +150,23 @@ class ServalSuite extends FunSuite {
   test("Secret toString") {
     assertEquals(SecretConfig(Secret("123")).toString, "SecretConfig(<secret>)")
   }
+
+  case class ListOfBoolConfig(list: List[Boolean])
+  given EnvRead[ListOfBoolConfig] = env("BOOLS")
+    .map(_.split(",").toList)
+    .asList[Boolean]
+    .map(ListOfBoolConfig.apply)
+
+  test("ListOfBool success") {
+    val result = load[ListOfBoolConfig](Map("BOOLS" -> "true,false,false,true"))
+    assertEquals(
+      result,
+      Right(ListOfBoolConfig(List(true, false, false, true)))
+    )
+  }
+
+  test("ListOfBool parse error") {
+    val result = load[ListOfBoolConfig](Map("BOOLS" -> "true,foo,false"))
+    assert(result.isLeft)
+  }
 }

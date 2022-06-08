@@ -41,6 +41,7 @@ object EnvParse:
   given EnvParse[String, Int] = fromOption("Int")(_.toIntOption)
   given EnvParse[String, Double] = fromOption("Double")(_.toDoubleOption)
   given EnvParse[String, Float] = fromOption("Float")(_.toFloatOption)
+  given EnvParse[String, Boolean] = fromOption("Boolean")(_.toBooleanOption)
   given EnvParse[String, Duration] =
     fromOption("Duration")(s => Try(Duration(s)).toOption)
   given EnvParse[String, FiniteDuration] =

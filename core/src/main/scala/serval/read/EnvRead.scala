@@ -105,4 +105,21 @@ given EnvReadExtensions: {} with {
                 )
               )
           }
+
+  extension [A](envRead: EnvRead[List[A]])
+    def asList[B](using envParse: EnvParse[A, B]): EnvRead[List[B]] =
+      new EnvRead[List[B]]:
+        def read(values: Map[String, String]): EnvLoadResult[List[B]] =
+          envRead.read(values) match {
+            case EnvLoadResult.Success(name, value) =>
+              value.partitionMap(envParse.parse) match {
+                case (Nil, parsedValues) =>
+                  EnvLoadResult.Success(name, parsedValues)
+                case (errors, _) =>
+                  EnvLoadResult.Failure(
+                    EnvLoadError.ParseError(name, errors.mkString(", "))
+                  )
+              }
+            case f: EnvLoadResult.Failure => f
+          }
 }
