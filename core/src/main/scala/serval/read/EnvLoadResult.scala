@@ -19,7 +19,10 @@ package serval.read
 enum EnvLoadError:
   case Missing(name: String) extends EnvLoadError
   case ParseError(name: String, error: String) extends EnvLoadError
-  case AggregatedErrors(errors: List[EnvLoadError]) extends EnvLoadError
+  case AggregatedErrors(
+      missing: List[EnvLoadError.Missing],
+      parseErrors: List[EnvLoadError.ParseError]
+  ) extends EnvLoadError
 
 enum EnvLoadResult[+A]:
   case Success(name: String, value: A) extends EnvLoadResult[A]
@@ -54,15 +57,28 @@ given EnvLoadResultExtensions: {} with {
 
 def combineErrors(error1: EnvLoadError, error2: EnvLoadError): EnvLoadError =
   (error1, error2) match {
-    case (AggregatedErrors(list1), AggregatedErrors(list2)) =>
-      AggregatedErrors(list1 ++ list2)
+    case (
+          AggregatedErrors(missing1, parseErrors1),
+          AggregatedErrors(missing2, parseErrors2)
+        ) =>
+      AggregatedErrors(missing1 ++ missing2, parseErrors1 ++ parseErrors2)
 
-    case (AggregatedErrors(list), other) =>
-      AggregatedErrors(other :: list)
+    case (AggregatedErrors(missingList, parseErrors), missing: Missing) =>
+      AggregatedErrors(missing :: missingList, parseErrors)
 
-    case (other, AggregatedErrors(list)) =>
-      AggregatedErrors(other :: list)
+    case (AggregatedErrors(missingList, parseErrors), parseError: ParseError) =>
+      AggregatedErrors(missingList, parseError :: parseErrors)
+
+    case (missing: Missing, AggregatedErrors(missingList, parseErrors)) =>
+      AggregatedErrors(missing :: missingList, parseErrors)
+
+    case (parseError: ParseError, AggregatedErrors(missingList, parseErrors)) =>
+      AggregatedErrors(missingList, parseError :: parseErrors)
 
     case (error1, error2) =>
-      AggregatedErrors(List(error1, error2))
+      val errors = List(error1, error2)
+      AggregatedErrors(
+        errors.collect { case m: Missing => m },
+        errors.collect { case p: ParseError => p }
+      )
   }
