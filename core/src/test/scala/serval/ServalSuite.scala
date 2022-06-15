@@ -183,7 +183,19 @@ class ServalSuite extends FunSuite {
   }
 
   test("VariablesWithPrefix empty") {
-    val result = load[VariablesWithPrefix](Map())
+    val result = load[VariablesWithPrefix](Map.empty)
     assertEquals(result, Right(VariablesWithPrefix(List())))
+  }
+
+  case class DefaultInstanceConfig(a: String, b: String)
+  given EnvRead[DefaultInstanceConfig] =
+    (
+      env("CONFIG_A"),
+      env("CONFIG_B")
+    ).mapN(DefaultInstanceConfig.apply).default(DefaultInstanceConfig("a", "b"))
+
+  test("DefaultInstanceConfig all missing") {
+    val result = load[DefaultInstanceConfig](Map.empty)
+    assertEquals(result, Right(DefaultInstanceConfig("a", "b")))
   }
 }

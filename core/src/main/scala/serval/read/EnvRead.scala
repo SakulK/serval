@@ -85,6 +85,8 @@ given EnvReadExtensions: {} with {
                   )
                 case result => result
               }
+            case EnvLoadResult.Failure(EnvLoadError.AggregatedErrors(_, Nil)) =>
+              other.read(values)
             case f: EnvLoadResult.Failure => f
           }
 
@@ -93,7 +95,10 @@ given EnvReadExtensions: {} with {
         def read(values: Map[String, String]): EnvLoadResult[A] =
           envRead.read(values) match {
             case s: EnvLoadResult.Success[A] => s
-            case EnvLoadResult.Failure(_: EnvLoadError.Missing) =>
+            case EnvLoadResult.Failure(
+                  EnvLoadError.Missing(_) |
+                  EnvLoadError.AggregatedErrors(_, Nil)
+                ) =>
               EnvLoadResult.Success("<default>", value)
             case f: EnvLoadResult.Failure => f
           }
@@ -109,11 +114,15 @@ given EnvReadExtensions: {} with {
               EnvLoadResult.Failure(
                 EnvLoadError.ParseError(e.name, "Failed to parse secret value")
               )
-            case EnvLoadResult.Failure(e: EnvLoadError.AggregatedErrors) =>
+            case EnvLoadResult.Failure(
+                  EnvLoadError.AggregatedErrors(missing, parseErrors)
+                ) =>
               EnvLoadResult.Failure(
-                EnvLoadError.ParseError(
-                  "",
-                  "Multiple errors while loading secret value"
+                EnvLoadError.AggregatedErrors(
+                  missing,
+                  parseErrors.map(
+                    _.copy(error = "Failed to parse secret value")
+                  )
                 )
               )
           }

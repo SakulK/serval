@@ -29,7 +29,7 @@ object EnvLoadException {
     error match {
       case EnvLoadError.Missing(name)           => s" - $name: Variable missing"
       case EnvLoadError.ParseError(name, error) => s" - $name: $error"
-      case EnvLoadError.AggregatedErrors(errors) =>
-        errors.map(renderError).mkString("\n")
+      case EnvLoadError.AggregatedErrors(missing, parseErrors) =>
+        (missing ++ parseErrors).map(renderError).mkString("\n")
     }
 }
