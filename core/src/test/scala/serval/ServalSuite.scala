@@ -198,4 +198,51 @@ class ServalSuite extends FunSuite {
     val result = load[DefaultInstanceConfig](Map.empty)
     assertEquals(result, Right(DefaultInstanceConfig("a", "b")))
   }
+
+  case class FlatMapConfig(b: String)
+  given EnvRead[FlatMapConfig] =
+    env("CONFIG_NAME")
+      .flatMap { name =>
+        env(name)
+      }
+      .map(FlatMapConfig.apply)
+
+  test("FlatMapConfig success") {
+    val result =
+      load[FlatMapConfig](Map("CONFIG_NAME" -> "OTHER", "OTHER" -> "foo"))
+    assertEquals(result, Right(FlatMapConfig("foo")))
+  }
+
+  test("FlatMapConfig missing") {
+    val result = load[FlatMapConfig](Map("CONFIG_NAME" -> "OTHER"))
+    assert(result.isLeft)
+  }
+
+  case class ForComprehensionConfig(a: String, b: String)
+  given EnvRead[ForComprehensionConfig] =
+    for {
+      a <- env("CONFIG_A")
+      b <- env("CONFIG_B")
+    } yield ForComprehensionConfig(a, b)
+
+  test("ForComprehensionConfig success") {
+    val result = load[ForComprehensionConfig](
+      Map("CONFIG_A" -> "foo", "CONFIG_B" -> "bar")
+    )
+    assertEquals(result, Right(ForComprehensionConfig("foo", "bar")))
+  }
+
+  case class OptionConfig(a: Option[String])
+  given EnvRead[OptionConfig] =
+    env("MAYBE").option.map(OptionConfig.apply)
+
+  test("OptionConfig Some") {
+    val result = load[OptionConfig](Map("MAYBE" -> "foo"))
+    assertEquals(result, Right(OptionConfig(Some("foo"))))
+  }
+
+  test("OptionConfig None") {
+    val result = load[OptionConfig](Map.empty)
+    assertEquals(result, Right(OptionConfig(None)))
+  }
 }

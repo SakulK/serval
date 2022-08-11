@@ -39,6 +39,7 @@ object EnvParse:
       def parse(input: A): Either[String, B] = f(input)
 
   given EnvParse[String, Int] = fromOption("Int")(_.toIntOption)
+  given EnvParse[String, Long] = fromOption("Long")(_.toLongOption)
   given EnvParse[String, Double] = fromOption("Double")(_.toDoubleOption)
   given EnvParse[String, Float] = fromOption("Float")(_.toFloatOption)
   given EnvParse[String, Boolean] = fromOption("Boolean")(_.toBooleanOption)

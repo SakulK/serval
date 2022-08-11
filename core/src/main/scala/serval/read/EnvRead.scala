@@ -59,6 +59,16 @@ given EnvReadExtensions: {} with {
             case f: EnvLoadResult.Failure => f
           }
 
+    def flatMap[B](f: A => EnvRead[B]): EnvRead[B] =
+      new EnvRead[B] {
+        def read(values: Map[String, String]): EnvLoadResult[B] =
+          envRead.read(values) match {
+            case EnvLoadResult.Success(name, value) =>
+              f(value).read(values)
+            case f: EnvLoadResult.Failure => f
+          }
+      }
+
     def as[B](using envParse: EnvParse[A, B]): EnvRead[B] =
       new EnvRead[B]:
         def read(values: Map[String, String]): EnvLoadResult[B] =
@@ -102,6 +112,9 @@ given EnvReadExtensions: {} with {
               EnvLoadResult.Success("<default>", value)
             case f: EnvLoadResult.Failure => f
           }
+
+    def option: EnvRead[Option[A]] =
+      envRead.map(Option.apply).default(Option.empty)
 
     def secret: EnvRead[Secret[A]] =
       new EnvRead[Secret[A]]:
