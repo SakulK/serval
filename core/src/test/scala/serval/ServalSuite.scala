@@ -201,8 +201,8 @@ class ServalSuite extends FunSuite {
 
   case class FlatMapConfig(b: String)
   given EnvRead[FlatMapConfig] =
-    env("CONFIG_NAME").flatMap { name =>
-
+    env("CONFIG_NAME")
+      .flatMap { name =>
         env(name)
       }
       .map(FlatMapConfig.apply)
