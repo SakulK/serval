@@ -37,6 +37,8 @@ object legacy:
     def or(other: EnvRead[A]): EnvRead[A] = EnvReadExtensions.or(envRead)(other)
     def default(value: A): EnvRead[A] =
       EnvReadExtensions.default(envRead)(value)
+    def option: EnvRead[Option[A]] =
+      EnvReadExtensions.option(envRead)
     def secret: EnvRead[Secret[A]] = EnvReadExtensions.secret(envRead)
 
   implicit class EnvReadListOps[A](private val envRead: EnvRead[List[A]])
