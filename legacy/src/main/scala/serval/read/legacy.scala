@@ -30,6 +30,7 @@ object legacy:
 
   implicit class EnvReadOps[A](private val envRead: EnvRead[A]) extends AnyVal:
     def map[B](f: A => B): EnvRead[B] = EnvReadExtensions.map(envRead)(f)
+    def flatMap[B](f: A => EnvRead[B]): EnvRead[B] = EnvReadExtensions.flatMap(envRead)(f)
     def as[B](using envParse: EnvParse[A, B]): EnvRead[B] =
       EnvReadExtensions.as(envRead)[B]
     def or(other: EnvRead[A]): EnvRead[A] = EnvReadExtensions.or(envRead)(other)
