@@ -113,6 +113,9 @@ given EnvReadExtensions: {} with {
             case f: EnvLoadResult.Failure => f
           }
 
+    def option: EnvRead[Option[A]] =
+      envRead.map(Option.apply).default(Option.empty)
+
     def secret: EnvRead[Secret[A]] =
       new EnvRead[Secret[A]]:
         def read(values: Map[String, String]): EnvLoadResult[Secret[A]] =

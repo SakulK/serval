@@ -231,4 +231,18 @@ class ServalSuite extends FunSuite {
     )
     assertEquals(result, Right(ForComprehensionConfig("foo", "bar")))
   }
+
+  case class OptionConfig(a: Option[String])
+  given EnvRead[OptionConfig] =
+    env("MAYBE").option.map(OptionConfig.apply)
+
+  test("OptionConfig Some") {
+    val result = load[OptionConfig](Map("MAYBE" -> "foo"))
+    assertEquals(result, Right(OptionConfig(Some("foo"))))
+  }
+
+  test("OptionConfig None") {
+    val result = load[OptionConfig](Map.empty)
+    assertEquals(result, Right(OptionConfig(None)))
+  }
 }
