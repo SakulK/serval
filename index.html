@@ -124,14 +124,14 @@
   )
 )
 </span><span class="comment">// res0: Either[EnvLoadException, MyConfig] = Right(
-//   MyConfig(&quot;foo&quot;, 42, &quot;bazinga&quot;)
+//   value = MyConfig(foo = &quot;foo&quot;, bar = 42, baz = &quot;bazinga&quot;)
 // )
 </span><span>
 </span><span class="identifier">serval</span><span>.</span><span class="identifier">load</span><span>[</span><span class="type-name">MyConfig</span><span>](
   </span><span class="type-name">Map</span><span>(</span><span class="string-literal">&quot;CONFIG_BAR&quot;</span><span> -&gt; </span><span class="string-literal">&quot;bar&quot;</span><span>)
 )
 </span><span class="comment">// res1: Either[EnvLoadException, MyConfig] = Left(
-//   serval.EnvLoadException: Failed to load config from environment:
+//   value = serval.EnvLoadException: Failed to load config from environment:
 //  - CONFIG_FOO|CONFIG_FOO_2: Variable missing
 //  - CONFIG_BAR: Failed to parse Int from &quot;bar&quot;
 // )</span></code></pre>
@@ -156,7 +156,7 @@
   )
 )
 </span><span class="comment">// res3: Either[EnvLoadException, MyConfig] = Right(
-//   MyConfig(&quot;foo&quot;, 42, &quot;bazinga&quot;)
+//   value = MyConfig(foo = &quot;foo&quot;, bar = 42, baz = &quot;bazinga&quot;)
 // )</span></code></pre>
 
         <hr style="margin-top: 30px"/>
