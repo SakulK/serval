@@ -15,7 +15,7 @@ ThisBuild / tlSonatypeUseLegacyHost := false
 // publish website from this branch
 ThisBuild / tlSitePublishBranch := Some("main")
 
-val Scala3 = "3.1.2"
+val Scala3 = "3.2.1"
 ThisBuild / scalaVersion := Scala3
 
 lazy val root = tlCrossRootProject.aggregate(core, legacy)
