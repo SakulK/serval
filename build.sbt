@@ -20,17 +20,17 @@ ThisBuild / scalaVersion := Scala3
 
 lazy val root = tlCrossRootProject.aggregate(core, legacy)
 
-lazy val core = crossProject(JVMPlatform, JSPlatform)
+lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("core"))
   .settings(
     name := "serval-core",
     libraryDependencies ++= Seq(
-      "org.scalameta" %%% "munit" % "0.7.29" % Test
+      "org.scalameta" %%% "munit" % "1.0.0-M7" % Test
     )
   )
 
-lazy val legacy = crossProject(JVMPlatform, JSPlatform)
+lazy val legacy = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("legacy"))
   .settings(
