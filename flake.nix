@@ -12,16 +12,15 @@
           inherit system;
           overlays = [ typelevel-nix.overlay ];
         };
-      in
-      {
+      in {
         devShell = pkgs.devshell.mkShell {
           imports = [ typelevel-nix.typelevelShell ];
           name = "serval-shell";
           typelevelShell = {
-            jdk.package = pkgs.jdk11;
+            jdk.package = pkgs.jdk17;
             nodejs.enable = true;
+            native.enable = true;
           };
         };
-      }
-    );
+      });
 }

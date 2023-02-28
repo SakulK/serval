@@ -1,5 +1,5 @@
 // https://typelevel.org/sbt-typelevel/faq.html#what-is-a-base-version-anyway
-ThisBuild / tlBaseVersion := "0.4" // your current series x.y
+ThisBuild / tlBaseVersion := "0.5" // your current series x.y
 
 ThisBuild / organization := "io.github.sakulk"
 ThisBuild / organizationName := "serval"
@@ -20,17 +20,17 @@ ThisBuild / scalaVersion := Scala3
 
 lazy val root = tlCrossRootProject.aggregate(core, legacy)
 
-lazy val core = crossProject(JVMPlatform, JSPlatform)
+lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("core"))
   .settings(
     name := "serval-core",
     libraryDependencies ++= Seq(
-      "org.scalameta" %%% "munit" % "0.7.29" % Test
+      "org.scalameta" %%% "munit" % "1.0.0-M7" % Test
     )
   )
 
-lazy val legacy = crossProject(JVMPlatform, JSPlatform)
+lazy val legacy = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("legacy"))
   .settings(
