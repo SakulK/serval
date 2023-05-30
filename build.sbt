@@ -1,5 +1,5 @@
 // https://typelevel.org/sbt-typelevel/faq.html#what-is-a-base-version-anyway
-ThisBuild / tlBaseVersion := "0.5" // your current series x.y
+ThisBuild / tlBaseVersion := "0.6" // your current series x.y
 
 ThisBuild / organization := "io.github.sakulk"
 ThisBuild / organizationName := "serval"
@@ -15,7 +15,7 @@ ThisBuild / tlSonatypeUseLegacyHost := false
 // publish website from this branch
 ThisBuild / tlSitePublishBranch := Some("main")
 
-val Scala3 = "3.2.1"
+val Scala3 = "3.3.0"
 ThisBuild / scalaVersion := Scala3
 
 lazy val root = tlCrossRootProject.aggregate(core, legacy)
