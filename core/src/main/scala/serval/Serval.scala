@@ -16,7 +16,7 @@
 
 package serval
 
-import serval.read.{EnvRead, EnvLoadResult, EnvLoadError}
+import serval.read.{EnvRead, EnvLoadResult}
 
 def load[T: EnvRead](values: Map[String, String]): Either[EnvLoadException, T] =
   EnvRead[T].read(values) match {

@@ -1,5 +1,5 @@
 // https://typelevel.org/sbt-typelevel/faq.html#what-is-a-base-version-anyway
-ThisBuild / tlBaseVersion := "0.5" // your current series x.y
+ThisBuild / tlBaseVersion := "0.6" // your current series x.y
 
 ThisBuild / organization := "io.github.sakulk"
 ThisBuild / organizationName := "serval"
@@ -15,7 +15,7 @@ ThisBuild / tlSonatypeUseLegacyHost := false
 // publish website from this branch
 ThisBuild / tlSitePublishBranch := Some("main")
 
-val Scala3 = "3.3.0"
+val Scala3 = "3.3.3"
 ThisBuild / scalaVersion := Scala3
 
 lazy val root = tlCrossRootProject.aggregate(core, legacy)
@@ -26,7 +26,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .settings(
     name := "serval-core",
     libraryDependencies ++= Seq(
-      "org.scalameta" %%% "munit" % "1.0.0-M7" % Test
+      "org.scalameta" %%% "munit" % "1.0.0" % Test
     )
   )
 
@@ -42,8 +42,14 @@ lazy val docs = project
   .in(file("site"))
   .enablePlugins(TypelevelSitePlugin)
   .settings(
-    tlSiteRelatedProjects := Seq(
-      "Ciris" -> url("https://cir.is/")
-    )
+    tlSiteHelium ~= {
+      import laika.helium.config._
+      _.site.mainNavigation(appendLinks = Seq(
+        ThemeNavigationSection(
+          "Related Projects",
+          TextLink.external("https://cir.is/", "Ciris")
+        )
+      ))
+    }
   )
   .dependsOn(legacy.jvm)
