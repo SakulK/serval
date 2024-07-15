@@ -4,6 +4,7 @@ ThisBuild / tlBaseVersion := "0.6" // your current series x.y
 ThisBuild / organization := "io.github.sakulk"
 ThisBuild / organizationName := "serval"
 ThisBuild / licenses := Seq(License.Apache2)
+ThisBuild / startYear := Some(2023)
 ThisBuild / developers := List(
   // your GitHub handle and name
   tlGitHubDev("SakulK", "Łukasz Krenski")
