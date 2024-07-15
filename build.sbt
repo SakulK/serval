@@ -45,12 +45,14 @@ lazy val docs = project
   .settings(
     tlSiteHelium ~= {
       import laika.helium.config._
-      _.site.mainNavigation(appendLinks = Seq(
-        ThemeNavigationSection(
-          "Related Projects",
-          TextLink.external("https://cir.is/", "Ciris")
+      _.site.mainNavigation(appendLinks =
+        Seq(
+          ThemeNavigationSection(
+            "Related Projects",
+            TextLink.external("https://cir.is/", "Ciris")
+          )
         )
-      ))
+      )
     }
   )
   .dependsOn(legacy.jvm)
