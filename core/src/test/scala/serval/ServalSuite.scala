@@ -245,4 +245,15 @@ class ServalSuite extends FunSuite {
     val result = load[OptionConfig](Map.empty)
     assertEquals(result, Right(OptionConfig(None)))
   }
+
+  case class DerivedConfig(simple: SimpleConfig, two: TwoValues) derives EnvRead
+
+  test("Derived config success") {
+    val result =
+      load[DerivedConfig](Map("CONFIG_A" -> "42", "CONFIG_B" -> "bar"))
+    assertEquals(
+      result,
+      Right(DerivedConfig(SimpleConfig(42), TwoValues(42, "bar")))
+    )
+  }
 }

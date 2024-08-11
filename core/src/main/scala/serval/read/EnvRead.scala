@@ -16,6 +16,9 @@
 
 package serval.read
 
+import scala.deriving.Mirror
+import scala.compiletime.*
+
 trait EnvRead[T]:
   def read(values: Map[String, String]): EnvLoadResult[T]
 
@@ -47,6 +50,36 @@ def pure[T](value: T): EnvRead[T] =
 object EnvRead:
   def apply[T](using envRead: EnvRead[T]): EnvRead[T] =
     envRead
+
+  inline def derived[T](using m: Mirror.Of[T]): EnvRead[T] =
+    inline m match
+      case s: Mirror.SumOf[T] => error("Only product types are supported")
+      case p: Mirror.ProductOf[T] =>
+        lazy val elemInstances = summonInstances[T, m.MirroredElemTypes]
+        new EnvRead[T]:
+          def read(values: Map[String, String]): EnvLoadResult[T] =
+            val elemResults = elemInstances.map(_.read(values))
+            val (elemErrors, elemSuccesses) = elemResults.partitionMap {
+              case success: EnvLoadResult.Success[?] => Right(success)
+              case EnvLoadResult.Failure(error)      => Left(error)
+            }
+            if elemErrors.nonEmpty then
+              EnvLoadResult.Failure(elemErrors.reduce(combineErrors))
+            else
+              EnvLoadResult.Success(
+                name = elemSuccesses.map(_.name).mkString(", "),
+                value = p.fromTuple(
+                  Tuple
+                    .fromArray(elemSuccesses.map(_.value).toArray)
+                    .asInstanceOf[p.MirroredElemTypes]
+                )
+              )
+
+  inline def summonInstances[T, Elems <: Tuple]: List[EnvRead[?]] =
+    inline erasedValue[Elems] match
+      case _: (elem *: elems) =>
+        summonInline[EnvRead[elem]] :: summonInstances[T, elems]
+      case _: EmptyTuple => Nil
 
 given EnvReadExtensions: {} with {
   extension [A](envRead: EnvRead[A])
