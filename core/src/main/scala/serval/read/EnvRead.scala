@@ -18,6 +18,7 @@ package serval.read
 
 import scala.deriving.Mirror
 import scala.compiletime.*
+import scala.annotation.nowarn
 
 trait EnvRead[T]:
   def read(values: Map[String, String]): EnvLoadResult[T]
@@ -50,6 +51,7 @@ object EnvRead:
   def apply[T](using envRead: EnvRead[T]): EnvRead[T] =
     envRead
 
+  @nowarn("id=197")
   inline def derived[T](using m: Mirror.Of[T]): EnvRead[T] =
     inline m match
       case s: Mirror.SumOf[T] => error("Only product types are supported")
