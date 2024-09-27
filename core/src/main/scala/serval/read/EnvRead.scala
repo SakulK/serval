@@ -25,10 +25,9 @@ trait EnvRead[T]:
 def env(name: String): EnvRead[String] =
   new EnvRead[String]:
     def read(values: Map[String, String]): EnvLoadResult[String] =
-      values.get(name) match {
+      values.get(name) match
         case Some(value) => EnvLoadResult.Success(name, value)
         case None        => EnvLoadResult.Failure(EnvLoadError.Missing(name))
-      }
 
 def envWithPrefix(prefix: String): EnvRead[List[String]] =
   new EnvRead[List[String]]:
@@ -81,62 +80,55 @@ object EnvRead:
         summonInline[EnvRead[elem]] :: summonInstances[T, elems]
       case _: EmptyTuple => Nil
 
-given EnvReadExtensions: {} with {
+given EnvReadExtensions: {} with
   extension [A](envRead: EnvRead[A])
     def map[B](f: A => B): EnvRead[B] =
       new EnvRead[B]:
         def read(values: Map[String, String]): EnvLoadResult[B] =
-          envRead.read(values) match {
+          envRead.read(values) match
             case EnvLoadResult.Success(name, value) =>
               EnvLoadResult.Success(name, f(value))
             case f: EnvLoadResult.Failure => f
-          }
 
     def flatMap[B](f: A => EnvRead[B]): EnvRead[B] =
-      new EnvRead[B] {
+      new EnvRead[B]:
         def read(values: Map[String, String]): EnvLoadResult[B] =
-          envRead.read(values) match {
+          envRead.read(values) match
             case EnvLoadResult.Success(name, value) =>
               f(value).read(values)
             case f: EnvLoadResult.Failure => f
-          }
-      }
 
     def as[B](using envParse: EnvParse[A, B]): EnvRead[B] =
       new EnvRead[B]:
         def read(values: Map[String, String]): EnvLoadResult[B] =
-          envRead.read(values) match {
+          envRead.read(values) match
             case EnvLoadResult.Success(name, value) =>
-              envParse.parse(value) match {
+              envParse.parse(value) match
                 case Right(parsed) => EnvLoadResult.Success(name, parsed)
                 case Left(error) =>
                   EnvLoadResult.Failure(EnvLoadError.ParseError(name, error))
-              }
             case f: EnvLoadResult.Failure => f
-          }
 
     def or(other: EnvRead[A]): EnvRead[A] =
       new EnvRead[A]:
         def read(values: Map[String, String]): EnvLoadResult[A] =
-          envRead.read(values) match {
+          envRead.read(values) match
             case s: EnvLoadResult.Success[A] => s
             case EnvLoadResult.Failure(EnvLoadError.Missing(name)) =>
-              other.read(values) match {
+              other.read(values) match
                 case EnvLoadResult.Failure(EnvLoadError.Missing(otherName)) =>
                   EnvLoadResult.Failure(
                     EnvLoadError.Missing(s"$name|$otherName")
                   )
                 case result => result
-              }
             case EnvLoadResult.Failure(EnvLoadError.AggregatedErrors(_, Nil)) =>
               other.read(values)
             case f: EnvLoadResult.Failure => f
-          }
 
     def default(value: A): EnvRead[A] =
       new EnvRead[A]:
         def read(values: Map[String, String]): EnvLoadResult[A] =
-          envRead.read(values) match {
+          envRead.read(values) match
             case s: EnvLoadResult.Success[A] => s
             case EnvLoadResult.Failure(
                   EnvLoadError.Missing(_) |
@@ -144,7 +136,6 @@ given EnvReadExtensions: {} with {
                 ) =>
               EnvLoadResult.Success("<default>", value)
             case f: EnvLoadResult.Failure => f
-          }
 
     def option: EnvRead[Option[A]] =
       envRead.map(Option.apply).default(Option.empty)
@@ -152,7 +143,7 @@ given EnvReadExtensions: {} with {
     def secret: EnvRead[Secret[A]] =
       new EnvRead[Secret[A]]:
         def read(values: Map[String, String]): EnvLoadResult[Secret[A]] =
-          envRead.read(values) match {
+          envRead.read(values) match
             case EnvLoadResult.Success(name, value) =>
               EnvLoadResult.Success(name, Secret(value))
             case f @ EnvLoadResult.Failure(EnvLoadError.Missing(_)) => f
@@ -171,24 +162,21 @@ given EnvReadExtensions: {} with {
                   )
                 )
               )
-          }
 
   extension [A](envRead: EnvRead[List[A]])
     def asList[B](using envParse: EnvParse[A, B]): EnvRead[List[B]] =
       new EnvRead[List[B]]:
         def read(values: Map[String, String]): EnvLoadResult[List[B]] =
-          envRead.read(values) match {
+          envRead.read(values) match
             case EnvLoadResult.Success(name, value) =>
-              value.partitionMap(envParse.parse) match {
+              value.partitionMap(envParse.parse) match
                 case (Nil, parsedValues) =>
                   EnvLoadResult.Success(name, parsedValues)
                 case (errors, _) =>
                   EnvLoadResult.Failure(
                     EnvLoadError.ParseError(name, errors.mkString(", "))
                   )
-              }
             case f: EnvLoadResult.Failure => f
-          }
 
   extension (envRead: EnvRead[String])
     def split(delimiter: String): EnvRead[List[String]] =
@@ -196,4 +184,3 @@ given EnvReadExtensions: {} with {
 
     def splitTrimAll(delimiter: String): EnvRead[List[String]] =
       envRead.split(delimiter).map(_.map(_.trim))
-}

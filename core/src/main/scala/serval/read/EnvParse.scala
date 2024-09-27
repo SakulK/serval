@@ -29,10 +29,9 @@ object EnvParse:
   def fromOption[A, B](typeName: String)(f: A => Option[B]): EnvParse[A, B] =
     new EnvParse[A, B]:
       def parse(input: A): Either[String, B] =
-        f(input) match {
+        f(input) match
           case Some(value) => Right(value)
           case None        => Left(s"Failed to parse $typeName from \"$input\"")
-        }
 
   def fromEither[A, B](f: A => Either[String, B]): EnvParse[A, B] =
     new EnvParse[A, B]:
@@ -50,10 +49,9 @@ object EnvParse:
       Try(Duration(s)).toOption.collect { case fd: FiniteDuration => fd }
     }
 
-given EnvParseExtensions: {} with {
+given EnvParseExtensions: {} with
   extension [A, B](envParse: EnvParse[A, B])
     def map[C](f: B => C): EnvParse[A, C] =
       new EnvParse[A, C]:
         def parse(input: A): Either[String, C] =
           envParse.parse(input).map(f)
-}

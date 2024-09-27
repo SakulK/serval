@@ -20,7 +20,7 @@ import munit.*
 import scala.concurrent.duration.*
 import serval.read.{given, *}
 
-class ServalSuite extends FunSuite {
+class ServalSuite extends FunSuite:
 
   case class SimpleConfig(a: Int)
 
@@ -220,10 +220,10 @@ class ServalSuite extends FunSuite {
 
   case class ForComprehensionConfig(a: String, b: String)
   given EnvRead[ForComprehensionConfig] =
-    for {
+    for
       a <- env("CONFIG_A")
       b <- env("CONFIG_B")
-    } yield ForComprehensionConfig(a, b)
+    yield ForComprehensionConfig(a, b)
 
   test("ForComprehensionConfig success") {
     val result = load[ForComprehensionConfig](
@@ -256,4 +256,3 @@ class ServalSuite extends FunSuite {
       Right(DerivedConfig(SimpleConfig(42), TwoValues(42, "bar")))
     )
   }
-}

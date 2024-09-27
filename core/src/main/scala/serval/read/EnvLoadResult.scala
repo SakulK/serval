@@ -31,10 +31,10 @@ enum EnvLoadResult[+A]:
 import EnvLoadError.*
 import EnvLoadResult.*
 
-given EnvLoadResultExtensions: {} with {
+given EnvLoadResultExtensions: {} with
   extension [A](ra: EnvLoadResult[A])
     def product[B](rb: EnvLoadResult[B]): EnvLoadResult[(A, B)] =
-      (ra, rb) match {
+      (ra, rb) match
         case (Success(nameA, valueA), Success(nameB, valueB)) =>
           Success(s"$nameA, $nameB", (valueA, valueB))
 
@@ -46,17 +46,14 @@ given EnvLoadResultExtensions: {} with {
 
         case (Failure(error1), Failure(error2)) =>
           Failure(combineErrors(error1, error2))
-      }
 
     def mapResult[B](f: A => B): EnvLoadResult[B] =
-      ra match {
+      ra match
         case Success(name, value) => Success(name, f(value))
         case failure: Failure     => failure
-      }
-}
 
 def combineErrors(error1: EnvLoadError, error2: EnvLoadError): EnvLoadError =
-  (error1, error2) match {
+  (error1, error2) match
     case (
           AggregatedErrors(missing1, parseErrors1),
           AggregatedErrors(missing2, parseErrors2)
@@ -81,4 +78,3 @@ def combineErrors(error1: EnvLoadError, error2: EnvLoadError): EnvLoadError =
         errors.collect { case m: Missing => m },
         errors.collect { case p: ParseError => p }
       )
-  }

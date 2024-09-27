@@ -19,12 +19,11 @@ package serval
 import serval.read.{EnvRead, EnvLoadResult}
 
 def load[T: EnvRead](values: Map[String, String]): Either[EnvLoadException, T] =
-  EnvRead[T].read(values) match {
+  EnvRead[T].read(values) match
     case EnvLoadResult.Success(name, value) =>
       Right(value)
     case EnvLoadResult.Failure(error) =>
       Left(EnvLoadException(error))
-  }
 
 def loadOrThrow[T: EnvRead](values: Map[String, String]): T =
   load[T](values).fold(throw _, identity)

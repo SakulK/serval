@@ -21,15 +21,13 @@ import serval.read.EnvLoadError
 class EnvLoadException(val error: EnvLoadError)
     extends RuntimeException(EnvLoadException.createMessage(error))
 
-object EnvLoadException {
+object EnvLoadException:
   def createMessage(error: EnvLoadError): String =
     s"Failed to load config from environment:\n${renderError(error)}"
 
   def renderError(error: EnvLoadError): String =
-    error match {
+    error match
       case EnvLoadError.Missing(name)           => s" - $name: Variable missing"
       case EnvLoadError.ParseError(name, error) => s" - $name: $error"
       case EnvLoadError.AggregatedErrors(missing, parseErrors) =>
         (missing ++ parseErrors).map(renderError).mkString("\n")
-    }
-}

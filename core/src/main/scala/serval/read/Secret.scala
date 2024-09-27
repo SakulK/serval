@@ -16,17 +16,15 @@
 
 package serval.read
 
-class Secret[T](secretValue: T) {
+class Secret[T](secretValue: T):
 
   def value: T = secretValue
 
   override final def hashCode: Int = secretValue.hashCode
 
   override final def equals(other: Any): Boolean =
-    other match {
+    other match
       case otherSecret: Secret[?] => secretValue == otherSecret.value
       case _                      => false
-    }
 
   override final def toString: String = "<secret>"
-}
